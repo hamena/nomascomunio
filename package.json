@@ -1,0 +1,28 @@
+{
+  "name": "biwenger-comander",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamena/biwenger-comander.git"
+  },
+  "keywords": [
+    "biwenger",
+    "comunio",
+    "comander"
+  ],
+  "author": "José Crespo Guerrero <hamena>",
+  "license": "GPL-2.0-only",
+  "bugs": {
+    "url": "https://github.com/hamena/biwenger-comander/issues"
+  },
+  "homepage": "https://github.com/hamena/biwenger-comander#readme",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0"
+  }
+}
