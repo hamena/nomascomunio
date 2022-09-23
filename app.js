@@ -1,45 +1,96 @@
-require('dotenv').config()
-const filter = require("./util/filter")
-const api = require("./requests/api")
+import leagueModel from './model/league_model.js'
+import teamModel from './model/team_model.js'
+import marketModel from './model/market_model.js'
+import Analyst from './team/analyst.js'
+import Coach from './team/coach.js'
+import { playerPositions } from './api/basics_api.js'
 
-run = async () => {
+
+const app = async () => {
   try {
-    await api.login()
-    await api.fetch()
-    api.process()
 
-    const minPrice = 5000000
-    const minPriceIncrement = 100000
-    const whitelist = ['Memphis Depay', 'Mojica', 'Jordán', 'Gerard Moreno', 'Aubameyang']
-    const minFitness = 30
-    const minPointsPerMatch = 6
+    console.info('jwt:', process.env.AUTH_TOKEN)
 
-    const byPrice = filter.byPrice(api.market.sales, minPrice)
-    const byPriceIncrement = filter.byPriceIncrement(api.market.sales, minPriceIncrement)
-    const byWhitelist = filter.byWhitelist(api.market.sales, whitelist)
-    const byFitness = filter.byFitness(api.market.sales, minFitness)
-    const byPointsPerMatch = filter.byPointsPerMatch(api.market.sales, minPointsPerMatch)
-
-    const filteredSales = filter.merge([byPrice, byPriceIncrement, byWhitelist, byFitness, byPointsPerMatch])
+    await teamModel.fetch()
+    // console.info('team players:', teamModel.getPlayers())
+    // console.info('lineup:', teamModel.getLineup())
     
-    filteredSales.forEach(sale => {
-      const increment = sale.player.priceIncrement
-      const nHome = sale.player.playedHome
-      const nAway = sale.player.playedAway
-      console.info("----------------------------")
-      console.info("\t", sale.player.name)
-      console.info("----------------------------")
-      console.info("  Value:", sale.player.price, "Price:", sale.price, increment >= 0 ? "+"+increment : increment)
-      console.info("  Matches:", nHome + nAway, "H("+nHome+") V("+nAway+")")
-      console.info("  Fitness:", sale.player.fitness, "Value:", sale.player.fitnessValue)
-      console.info("  Points:", sale.player.points, "PPM:", sale.player.pointsPerMatch)
-      console.info("----------------------------")
-      console.info("")
+    await leagueModel.fetch()
+    // console.info('Rounds:', leagueModel.getRounds())
+    // console.info('Players:', leagueModel.getPlayers())
+
+    await marketModel.fetch()
+    // console.info('Balance:', marketModel.getBalance(), 'Max bid:', marketModel.getMaxBid())
+    // console.info('Market sales', marketModel.getSales())
+    // console.info('Market offers', marketModel.getOffers())
+
+    // const detailedTeam = teamModel.getPlayers().map(playerid => leagueModel.getPlayer(playerid))
+    // console.info('detailed team:', detailedTeam)
+
+    // TEST ANALYST
+    const analyst = new Analyst(leagueModel)
+    teamModel.getPlayers().forEach(playerId => {
+      const player = leagueModel.getPlayer(playerId)
+      if (player !== undefined) {   
+        analyst.evalPlayer(player)
+        printPlayer(player)
+      } else {
+        console.error('Undefined player! ID:', playerId)
+      }
     })
 
+    // TEST COACH
+    const coach = new Coach(leagueModel, teamModel, analyst)
+    const lineups = coach.bestLineups()
+    const lineupsArray = Object.values(lineups)
+    lineupsArray.forEach(lineup => printLineup(lineup))
+    lineupsArray.sort((a, b) => b.perfEval - a.perfEval)
+    const bestLineup = lineupsArray[0]
+    console.info('Best lineup: ')
+    printLineup(bestLineup)
+    // wbapi.putLineUp(bestLineup.type, bestLineup.lineup)
+
+    // // TEST MANAGER
+    // const manager = new Manager(leagueModel, marketModel)
+    // manager.critics(bestLineup)
   } catch (error) {
-    console.error('Error while running:', error)
+    console.error('Oopsss this error should not be here!', error)
   }
 }
 
-run()
+function printLineup(lineup) {
+  const players = lineup.lineup.map(playerId => leagueModel.getPlayer(playerId)).filter(player => player !== undefined)
+  const keepers = players.filter(player => player.position === playerPositions.keeper)
+  const defenders = players.filter(player => player.position === playerPositions.defender)
+  const midfielders = players.filter(player => player.position === playerPositions.midfielder)
+  const forwards = players.filter(player => player.position === playerPositions.forward)
+  var keepersStr = 'KP: '
+  var defendersStr = 'DF: '
+  var midfieldersStr = 'MF: '
+  var forwardsStr = 'FW: '
+  keepers.forEach(keeper => keepersStr += keeper.slug+', ')
+  defenders.forEach(defender => defendersStr += defender.slug+', ')
+  midfielders.forEach(midfielder => midfieldersStr += midfielder.slug+', ')
+  forwards.forEach(forward => forwardsStr += forward.slug+', ')
+  console.info('--------', lineup.type, '-', lineup.perfEval, '--------')
+  console.info(keepersStr)
+  console.info(defendersStr)
+  console.info(midfieldersStr)
+  console.info(forwardsStr)
+}
+
+function printPlayer(player) {
+  console.info('-------------------------------------------')
+  console.info(positionName[player.position], '['+player.id+']', player.slug, 'PERF:', player.perfEval)
+  console.info('Value:', player.price, player.priceIncrement)
+  console.info('Points:', player.points, 'H('+player.pointsHome+')', 'A('+player.pointsAway+') -', 'Last season:', player.pointsLastSeason)
+  console.info('Points score:', player.pointsScore)
+  console.info('Fitness:', player.fitness, '- Gradient:', player.fitnessGradient, 'Prediction:', player.fitnessPrediction)
+  console.info('Fitness score:', player.fitnessScore)
+}
+
+const positionName = {
+  '0': 'none', '1': 'KP', '2': 'DF', '3': 'MF', '4': 'FW', '5': 'COACH'
+}
+
+app()
