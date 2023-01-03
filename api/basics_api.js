@@ -4,7 +4,7 @@ export const scoreIds = {
   as: 2,
   statistics: 3,
   jornadaPerfecta: 4,
-  averageAsSofascore: 5,
+  sofascoreAsAvg: 5,
   biwengerSocial: 6
 }
 

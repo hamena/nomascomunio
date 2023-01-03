@@ -50,3 +50,50 @@ export const nRoundsInSeason = 38
 export const maxPlayerPointsPerMatch = 6 // estimated
 export const maxPlayerPointsInFitness = 5 * maxPlayerPointsPerMatch
 export const maxPlayerPointsInSeason = nRoundsInSeason * maxPlayerPointsPerMatch
+
+export const biwengeritoPlayers = [ 
+  {
+    id: 3807605,
+    name: 'Calculon'
+  },
+  {
+    id: 6651914,
+    name: 'Pana23'
+  },
+  {
+    id: 3831790,
+    name: 'El Hobbit que mira mal'
+  },
+  {
+    id: 5032856,
+    name: 'Berto Cervera'
+  },
+  {
+    id: 3836843,
+    name: 'nomascomunio'
+  },
+  {
+    id: 6655974,
+    name: 'Los pollas tristes'
+  },
+  {
+    id: 6651736,
+    name: 'Anacardo Sánchez'
+  },
+  {
+    id: 6651339,
+    name: 'Vizcaíno dimisión'
+  },
+  {
+    id: 3807518,
+    name: 'Benito Camela'
+  },
+  {
+    id: 3806236,
+    name: 'Rubentino Pérez'
+  },
+  {
+    id: 3806204,
+    name: 'Las palancas'
+  }
+]

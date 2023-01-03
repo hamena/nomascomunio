@@ -4,13 +4,12 @@ import marketModel from './model/market_model.js'
 import Analyst from './team/analyst.js'
 import Coach from './team/coach.js'
 import { playerPositions } from './api/basics_api.js'
+import Manager from './team/manager.js'
+import bwapi from './api/api.js'
 
 
 const app = async () => {
   try {
-
-    console.info('jwt:', process.env.AUTH_TOKEN)
-
     await teamModel.fetch()
     // console.info('team players:', teamModel.getPlayers())
     // console.info('lineup:', teamModel.getLineup())
@@ -23,9 +22,6 @@ const app = async () => {
     // console.info('Balance:', marketModel.getBalance(), 'Max bid:', marketModel.getMaxBid())
     // console.info('Market sales', marketModel.getSales())
     // console.info('Market offers', marketModel.getOffers())
-
-    // const detailedTeam = teamModel.getPlayers().map(playerid => leagueModel.getPlayer(playerid))
-    // console.info('detailed team:', detailedTeam)
 
     // TEST ANALYST
     const analyst = new Analyst(leagueModel)
@@ -50,9 +46,30 @@ const app = async () => {
     printLineup(bestLineup)
     // wbapi.putLineUp(bestLineup.type, bestLineup.lineup)
 
-    // // TEST MANAGER
-    // const manager = new Manager(leagueModel, marketModel)
-    // manager.critics(bestLineup)
+    // TEST MANAGER
+    const manager = new Manager(leagueModel, marketModel, analyst)
+    manager.critics(bestLineup)
+
+    /* Fases del MANAGER
+     * 1. Aceptar ofertas por jugadores que no estén alineados y que no estén al alza por 50K o más
+     * 2. Cubrir posiciones en estado CRITIC (null o perf==0), algoritmo de voraz la mochila usando el valor/peso.
+     * 3. Si no habia posiciones CRITIC entonces mejorar plantilla actual: 
+     *      Aumentar perf haciendo swap (poner en oferta a X jugador a la vez que se realiza la puja por otro mejor en el mercado). 
+     *      Si la puja fué ganadora entonces al dia siguiente el jugador será vendido en la fase 1
+     * 4. Si no habia posiciones CRITIC entonces especular: 
+     *      Pujar por jugadores que estén al alza por 70K o más 
+     */
+  
+    /* Información derivada
+     *    - priceunits: precio / 150000
+     *    - valueQuality: priceunits / performance
+     *    - estimated current price units
+     */
+    
+    /* Como calcular las pujas
+     *    
+     */
+
   } catch (error) {
     console.error('Oopsss this error should not be here!', error)
   }
@@ -93,4 +110,77 @@ const positionName = {
   '0': 'none', '1': 'KP', '2': 'DF', '3': 'MF', '4': 'FW', '5': 'COACH'
 }
 
-app()
+// app()
+
+import fs from 'fs'
+import { biwengeritoPlayers } from './team/knowledge.js'
+
+
+
+const whosgone = async () => {
+
+  await leagueModel.fetch()
+
+  // const resp = await bwapi.getPlayerInfo('lewandowski')
+  // const resp = await bwapi.getPlayerInfo('yeray-alvarez')
+  // const resp = await bwapi.getPlayerInfo('alex-centelles')
+  // fs.writeFileSync('./jsoncache/playerInfo.json', JSON.stringify((resp.data.data)))
+
+  // const playerInfo = JSON.parse(fs.readFileSync('./jsoncache/playerInfo.json'))
+  // const ownedSince = 0
+  // // const ownedSince = 1662231600
+  // const reports = playerInfo.reports.filter(report => report.match.date > ownedSince && report.rawStats !== undefined).map(report => report.rawStats.score5).reduce((sum, a) => sum + a, 0)
+  // console.info(reports)
+  
+
+  // const resp = await bwapi.getOtherUserTeamInfo(3836843)
+  // fs.writeFileSync('./jsoncache/otherUserTeamInfo.json', JSON.stringify((resp.data.data)))
+  
+  // const otherUserTeamInfo = JSON.parse(fs.readFileSync('./jsoncache/otherUserTeamInfo.json'))
+  // const result = []
+  
+  // for (const iPlayer in otherUserTeamInfo.players) {
+  //   const player = otherUserTeamInfo.players[iPlayer]
+  //   const ownedSince = player.owner.date
+  //   const playerSlug = leagueModel.getPlayer(player.id).slug
+
+  //   const resp = await bwapi.getPlayerInfo(playerSlug)
+  //   const playerInfo = resp.data.data
+  //   const sum = playerInfo.reports.filter(report => report.match.date > ownedSince && report.rawStats !== undefined).map(report => report.rawStats.score5).reduce((sum, a) => sum + a, 0)
+  //   result.push({ name: playerSlug, ownedSince: ownedSince, points: sum })
+  // }
+
+  // console.info(result)
+
+  for (const iBiwengeritoPlayer in biwengeritoPlayers) {
+    const biwengeritoPlayer = biwengeritoPlayers[iBiwengeritoPlayer]
+    console.info('Procesing', biwengeritoPlayer.name)
+    const respTeamInfo = await bwapi.getOtherUserTeamInfo(biwengeritoPlayer.id)
+    const otherUserTeamInfo = respTeamInfo.data.data
+    const result = []
+    for (const iPlayer in otherUserTeamInfo.players) {
+      const player = otherUserTeamInfo.players[iPlayer]
+      const ownedSince = player.owner.date
+      const playerSlug = leagueModel.getPlayer(player.id).slug
+      
+      console.info('\tInspecting', playerSlug)
+      const resp = await bwapi.getPlayerInfo(playerSlug)
+      const playerInfo = resp.data.data
+      const sum = playerInfo.reports.filter(report => report.match.date > ownedSince && report.rawStats !== undefined).map(report => report.rawStats.score5).reduce((sum, a) => sum + a, 0)
+      result.push({ name: playerSlug, ownedSince: ownedSince, points: sum })
+    }
+    result.sort((a, b) => b.points - a.points)
+    biwengeritoPlayers[iBiwengeritoPlayer].players = result
+  }
+
+  fs.writeFileSync('./jsoncache/processedBiwengeritoPlayers.json', JSON.stringify(biwengeritoPlayers))
+
+  biwengeritoPlayers.forEach(bwPlayer => {
+    console.info('####', bwPlayer.name, '####')
+    bwPlayer.players.forEach(player => {
+      console.info('\t', player.name, player.points, 'puntos')
+    })
+  })
+}
+
+whosgone()

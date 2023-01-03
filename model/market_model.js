@@ -27,7 +27,7 @@ class MarketModel {
   }
 
   getSales() {
-    return this.#sales   
+    return this.#sales
   }
 
   getOffers() {

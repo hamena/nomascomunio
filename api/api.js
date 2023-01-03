@@ -7,7 +7,9 @@ import { scoreIds } from "./basics_api.js"
 const baseUrl = "https://biwenger.as.com"
 const endpoints = {
   apiV2User: baseUrl + '/api/v2/user',
+  apiV2UserId: baseUrl + '/api/v2/user/:userid',
   apiV2CompetitionsLaLigaData: baseUrl + '/api/v2/competitions/la-liga/data',
+  apiV2PlayersLaLigaPlayer: baseUrl + '/api/v2/players/la-liga/:playerslug',
   apiV2Market: baseUrl + '/api/v2/market',
   apiV2Offers: baseUrl + '/api/v2/offers'
 }
@@ -29,9 +31,19 @@ class BiwengerApi {
 
   async getLaLigaInfo() {
     const params = {
-      score: scoreIds.averageAsSofascore
+      score: scoreIds.sofascoreAsAvg
     }
     return await axios.get(endpoints.apiV2CompetitionsLaLigaData, {headers: this.#headers, params: params})
+  }
+
+  // fields=*,team,fitness,reports(points,home,events,status(status,statusInfo),match(*,round,home,away),star),prices,competition,seasons,news,threads
+  async getPlayerInfo(playerSlug, fields='fields=*,team,fitness,reports(points,home,events,status(status,statusInfo),match(*,round,home,away),star),prices') {
+    if (!playerSlug) throw new Error('Player slug must be defined')
+    const params = {
+      fields: fields
+    }
+    const playersLaLigaEndpoint = endpoints.apiV2PlayersLaLigaPlayer.replace(':playerslug', playerSlug)
+    return await axios.get(playersLaLigaEndpoint, {headers: this.#headers, params: params})
   }
 
   async getTeamInfo(fields='*,lineup(type,playersID,reservesID,coach,date),players(id)') {
@@ -39,6 +51,14 @@ class BiwengerApi {
       fields: fields
     }
     return await axios.get(endpoints.apiV2User, { headers: this.#headers, params: params })
+  }
+
+  async getOtherUserTeamInfo(userId, fields='*,account(id),players(id,owner),lineups(round,points,count,position),league(id,name,competition,type,mode,marketMode,scoreID),market,seasons,offers,lastPositions') {
+    const params = {
+      fields: fields
+    }
+    const userIdEndpoint = endpoints.apiV2UserId.replace(':userid', userId)
+    return await axios.get(userIdEndpoint, { headers: this.#headers, params: params })
   }
   
   async putLineUp(type='', lineup = []) {

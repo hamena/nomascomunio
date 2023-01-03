@@ -1,9 +1,14 @@
-import globals from "../globals.js"
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+const myUserId = Number(process.env.USER_ID)
 
 class Manager {
 
   #leagueModel
   #marketModel
+
+  #analyst
 
   #maxBid = 0
   #currentBalance = 0
@@ -19,9 +24,10 @@ class Manager {
   #toReject = []
   #toBid = []
 
-  constructor (leagueModel, marketModel) {
+  constructor (leagueModel, marketModel, analyst) {
     this.#leagueModel = leagueModel
     this.#marketModel = marketModel
+    this.#analyst = analyst
     this.refresh()
   }
 
@@ -31,9 +37,8 @@ class Manager {
     this.#marketSales = []
     this.#mySales = []
     this.#marketModel.getSales().forEach(sale => {
-      console.info(sale)
       sale.player = this.#leagueModel.getPlayer(sale.player.id)
-      if (sale.user?.id === globals.myUserId) {
+      if (sale.user?.id === myUserId) {
         this.#mySales.push(sale)
       } else {
         this.#marketSales.push(sale)
@@ -44,9 +49,9 @@ class Manager {
     this.#myBids = []
     this.#marketModel.getOffers().forEach(offer => {
       offer.player = this.#leagueModel.getPlayer(offer.requestedPlayers[0])
-      if (offer.to?.id === globals.myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
+      if (offer.to?.id === myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
         this.#myOffers.push(offer)
-      } else if (offer.from.id === globals.myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
+      } else if (offer.from?.id === myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
         this.#myBids.push(offer)
       } else {
         this.#marketOffers.push(offer)
@@ -58,14 +63,32 @@ class Manager {
     console.info('###### MARKET INFO ######')
     console.info('Balance:', this.#currentBalance, 'Max bid:', this.#maxBid)
     
-    console.info(' -- My market --')
-    console.info('My sales:', this.#mySales.map(sale => sale.player.id))
-    console.info('My offers:', this.#myOffers.map(offer => offer.player.id))
-    console.info('My bids:', this.#myBids.map(bid => bid.player.id))
+    console.info(' --- My sales ---')
+    console.info(this.#mySales.map(sale => { 
+      this.#analyst.evalPlayer(sale.player)
+      return sale
+    }))
+    console.info(' --- My offers ---')
+    console.info(this.#myOffers.map(offer => {
+      this.#analyst.evalPlayer(offer.player)
+      return offer
+    }))
+    console.info(' --- My bids ---')
+    console.info(this.#myBids.map(bid => {
+      this.#analyst.evalPlayer(bid.player)
+      return bid
+    }))
     
-    console.info(' -- Market --')
-    console.info('Market sales:', this.#marketSales.map(sale => sale.player.id))
-    console.info('Market offers:', this.#marketOffers.map(offer => offer.player.id))
+    console.info(' --- Market sales ---')
+    console.info(this.#marketSales.map(sale => {
+      this.#analyst.evalPlayer(sale.player)
+      return sale
+    }))
+    console.info(' --- Market offers ---')
+    console.info(this.#marketOffers.map(offer => {
+      this.#analyst.evalPlayer(offer.player)
+      return offer
+    }))
     console.info('#########################')
 
     console.info(lineup)
