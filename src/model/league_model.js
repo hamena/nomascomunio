@@ -1,40 +1,38 @@
-import bwapi from "../api/api.js"
+import bwapi from '../api/api.js';
 
 class LeagueModel {
-  
-  #players
-  #rounds
+  #players;
+  #rounds;
 
   constructor() {}
 
   async fetch() {
-    console.info('Fetching La Liga info...')
-    const response = await bwapi.getLaLigaInfo()
-    this.#players = response.data.data.players
-    this.#rounds = response.data.data.season.rounds
+    console.info('Fetching La Liga info...');
+    const response = await bwapi.getLaLigaInfo();
+    this.#players = response.data.data.players;
+    this.#rounds = response.data.data.season.rounds;
   }
 
   getPlayers() {
-    return this.#players
+    return this.#players;
   }
 
   getPlayer(playerid) {
-    return this.#players[playerid]
+    return this.#players[playerid];
   }
 
   getRounds() {
-    return this.#rounds
+    return this.#rounds;
   }
 
   getRound(index) {
-    return this.#rounds[index]
+    return this.#rounds[index];
   }
 
   getNextRound() {
-    return this.#rounds.filter(round => round.status === 'pending')[0] 
+    return this.#rounds.filter((round) => round.status === 'pending')[0];
   }
-
 }
 
-const leagueModel = new LeagueModel()
-export default leagueModel
+const leagueModel = new LeagueModel();
+export default leagueModel;

@@ -1,86 +1,100 @@
-import globals from "../globals.js"
+import globals from '../globals.js';
 
 class Manager {
+  #leagueModel;
+  #marketModel;
 
-  #leagueModel
-  #marketModel
+  #maxBid = 0;
+  #currentBalance = 0;
+  #marketSales = [];
+  #marketOffers = [];
 
-  #maxBid = 0
-  #currentBalance = 0
-  #marketSales = []
-  #marketOffers = []
+  #mySales = [];
+  #myOffers = [];
+  #myBids = [];
 
-  #mySales = []
-  #myOffers = []
-  #myBids = []
+  #toSell = [];
+  #toAccept = [];
+  #toReject = [];
+  #toBid = [];
 
-  #toSell = []
-  #toAccept = []
-  #toReject = []
-  #toBid = []
-
-  constructor (leagueModel, marketModel) {
-    this.#leagueModel = leagueModel
-    this.#marketModel = marketModel
-    this.refresh()
+  constructor(leagueModel, marketModel) {
+    this.#leagueModel = leagueModel;
+    this.#marketModel = marketModel;
+    this.refresh();
   }
 
   refresh() {
-    this.#currentBalance = this.#marketModel.getBalance()
-    this.#maxBid = this.#marketModel.getMaxBid()
-    this.#marketSales = []
-    this.#mySales = []
-    this.#marketModel.getSales().forEach(sale => {
-      console.info(sale)
-      sale.player = this.#leagueModel.getPlayer(sale.player.id)
+    this.#currentBalance = this.#marketModel.getBalance();
+    this.#maxBid = this.#marketModel.getMaxBid();
+    this.#marketSales = [];
+    this.#mySales = [];
+    this.#marketModel.getSales().forEach((sale) => {
+      console.info(sale);
+      sale.player = this.#leagueModel.getPlayer(sale.player.id);
       if (sale.user?.id === globals.myUserId) {
-        this.#mySales.push(sale)
+        this.#mySales.push(sale);
       } else {
-        this.#marketSales.push(sale)
+        this.#marketSales.push(sale);
       }
-    })
-    this.#marketOffers = []
-    this.#myOffers = []
-    this.#myBids = []
-    this.#marketModel.getOffers().forEach(offer => {
-      offer.player = this.#leagueModel.getPlayer(offer.requestedPlayers[0])
+    });
+    this.#marketOffers = [];
+    this.#myOffers = [];
+    this.#myBids = [];
+    this.#marketModel.getOffers().forEach((offer) => {
+      offer.player = this.#leagueModel.getPlayer(offer.requestedPlayers[0]);
       if (offer.to?.id === globals.myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
-        this.#myOffers.push(offer)
+        this.#myOffers.push(offer);
       } else if (offer.from.id === globals.myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
-        this.#myBids.push(offer)
+        this.#myBids.push(offer);
       } else {
-        this.#marketOffers.push(offer)
+        this.#marketOffers.push(offer);
       }
-    })
+    });
   }
 
   critics(lineup) {
-    console.info('###### MARKET INFO ######')
-    console.info('Balance:', this.#currentBalance, 'Max bid:', this.#maxBid)
-    
-    console.info(' -- My market --')
-    console.info('My sales:', this.#mySales.map(sale => sale.player.id))
-    console.info('My offers:', this.#myOffers.map(offer => offer.player.id))
-    console.info('My bids:', this.#myBids.map(bid => bid.player.id))
-    
-    console.info(' -- Market --')
-    console.info('Market sales:', this.#marketSales.map(sale => sale.player.id))
-    console.info('Market offers:', this.#marketOffers.map(offer => offer.player.id))
-    console.info('#########################')
+    console.info('###### MARKET INFO ######');
+    console.info('Balance:', this.#currentBalance, 'Max bid:', this.#maxBid);
 
-    console.info(lineup)
+    console.info(' -- My market --');
+    console.info(
+      'My sales:',
+      this.#mySales.map((sale) => sale.player.id),
+    );
+    console.info(
+      'My offers:',
+      this.#myOffers.map((offer) => offer.player.id),
+    );
+    console.info(
+      'My bids:',
+      this.#myBids.map((bid) => bid.player.id),
+    );
+
+    console.info(' -- Market --');
+    console.info(
+      'Market sales:',
+      this.#marketSales.map((sale) => sale.player.id),
+    );
+    console.info(
+      'Market offers:',
+      this.#marketOffers.map((offer) => offer.player.id),
+    );
+    console.info('#########################');
+
+    console.info(lineup);
 
     // P0 alineados
-    var patchPlayers = []
+    var patchPlayers = [];
     // P0 sobrantes
-    var uselessPlayers = []
+    var uselessPlayers = [];
     // nulls en lineup
     var nullCritics = {
       keepers: 0,
       defenders: 0,
       midFielders: 0,
-      forwards: 0
-    }
+      forwards: 0,
+    };
 
     // 1. Aceptar ofertas P0 sobrantes
     // 2. Cubrir nulls
@@ -116,21 +130,15 @@ class Manager {
     //   patchPlayer.swap = true
     // })
 
-
     // 4.
     // uselessPlayers.filter(player => this.#toAccept(player.id)).forEach(patch => {
     //   // sell patch
     // })
   }
 
-  improve() {
+  improve() {}
 
-  }
-
-  speculate() {
-
-  }
-
+  speculate() {}
 }
 
-export default Manager
+export default Manager;

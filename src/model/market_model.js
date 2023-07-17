@@ -1,40 +1,38 @@
-import bwapi from '../api/api.js'
+import bwapi from '../api/api.js';
 
 class MarketModel {
-
-  #balance = 0
-  #maxBid = 0
-  #sales = []
-  #offers = []
+  #balance = 0;
+  #maxBid = 0;
+  #sales = [];
+  #offers = [];
 
   constructor() {}
 
   async fetch() {
-    console.info('Fetching market info...')
-    const marketInfoResp = await bwapi.getMarketInfo()
-    this.#balance = marketInfoResp.data.data.status.balance
-    this.#maxBid = marketInfoResp.data.data.status.maximumBid
-    this.#sales = marketInfoResp.data.data.sales
-    this.#offers = marketInfoResp.data.data.offers
+    console.info('Fetching market info...');
+    const marketInfoResp = await bwapi.getMarketInfo();
+    this.#balance = marketInfoResp.data.data.status.balance;
+    this.#maxBid = marketInfoResp.data.data.status.maximumBid;
+    this.#sales = marketInfoResp.data.data.sales;
+    this.#offers = marketInfoResp.data.data.offers;
   }
 
   getBalance() {
-    return this.#balance
+    return this.#balance;
   }
 
   getMaxBid() {
-    return this.#maxBid
+    return this.#maxBid;
   }
 
   getSales() {
-    return this.#sales   
+    return this.#sales;
   }
 
   getOffers() {
-    return this.#offers
+    return this.#offers;
   }
-
 }
 
-const marketModel = new MarketModel()
-export default marketModel
+const marketModel = new MarketModel();
+export default marketModel;
