@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "start": "npm run build && node build/index.js",
   "scripts": {
     "start": "node app.js",
     "test": "test"
@@ -27,5 +28,9 @@
     "dotenv": "^16.0.0",
     "regression": "^2.0.1"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "typescript": "^5.1.6"
+  }
 }
