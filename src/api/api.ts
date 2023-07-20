@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import axios from 'axios';
-import { scoreIds } from './basics_api.js';
+import { scoreIds } from './basics_api';
 
 const baseUrl = 'https://biwenger.as.com';
 const endpoints = {
@@ -13,13 +13,13 @@ const endpoints = {
 };
 
 class BiwengerApi {
-  #headers;
+  private headers;
 
-  constructor(jwt, userid, leagueid) {
+  constructor(jwt?: string, userid?: string, leagueid?: string) {
     if (!jwt) throw new Error('JWT cannot be undefined');
     if (!userid) throw new Error('User ID cannot be undefined');
     if (!leagueid) throw new Error('League ID cannot be undefined');
-    this.#headers = {
+    this.headers = {
       Authorization: 'Bearer ' + jwt,
       'X-User': userid,
       'X-League': leagueid,
@@ -30,17 +30,17 @@ class BiwengerApi {
     const params = {
       score: scoreIds.averageAsSofascore,
     };
-    return await axios.get(endpoints.apiV2CompetitionsLaLigaData, { headers: this.#headers, params: params });
+    return await axios.get(endpoints.apiV2CompetitionsLaLigaData, { headers: this.headers, params: params });
   }
 
-  async getTeamInfo(fields = '*,lineup(type,playersID,reservesID,coach,date),players(id)') {
+  async getTeamInfo(fields: string = '*,lineup(type,playersID,reservesID,coach,date),players(id)') {
     const params = {
       fields: fields,
     };
-    return await axios.get(endpoints.apiV2User, { headers: this.#headers, params: params });
+    return await axios.get(endpoints.apiV2User, { headers: this.headers, params: params });
   }
 
-  async putLineUp(type = '', lineup = []) {
+  async putLineUp(type: string = '', lineup: number[] = []) {
     // validateLineUpType(type)
     // validateLineUp(lineup)
     const body = {
@@ -50,14 +50,14 @@ class BiwengerApi {
         reservesID: [],
       },
     };
-    return await axios.put(endpoints.apiV2User, body, { headers: this.#headers });
+    return await axios.put(endpoints.apiV2User, body, { headers: this.headers });
   }
 
   async getMarketInfo() {
-    return await axios.get(endpoints.apiV2Market, { headers: this.#headers });
+    return await axios.get(endpoints.apiV2Market, { headers: this.headers });
   }
 
-  async postOffer(playerid, amount, to = null) {
+  async postOffer(playerid: number, amount: number, to = null) {
     if (!playerid || playerid <= 0) throw new Error('Playerid must be defined and positive');
     if (!amount || amount <= 0) throw new Error('Amount must be defined and positive');
     const body = {
@@ -66,10 +66,10 @@ class BiwengerApi {
       to: to,
       type: 'purchase',
     };
-    return await axios.post(endpoints.apiV2Offers, body, { headers: this.#headers });
+    return await axios.post(endpoints.apiV2Offers, body, { headers: this.headers });
   }
 
-  async putOffer(offerid, status) {
+  async putOffer(offerid: number, status: string) {
     if (!offerid || offerid <= 0) throw new Error('Offer ID must be defined and positive');
     if (!status) throw new Error('Status must be defined');
     if (status !== 'accepted' && status !== 'rejected')
@@ -79,10 +79,10 @@ class BiwengerApi {
     const body = {
       status: status,
     };
-    return await axios.put(endpoints.apiV2Offers, body, { headers: this.#headers });
+    return await axios.put(endpoints.apiV2Offers, body, { headers: this.headers });
   }
 
-  async postSale(playerid, amount) {
+  async postSale(playerid: number, amount: number) {
     if (!playerid || playerid <= 0) throw new Error('Playerid must be defined and positive');
     if (!amount || amount <= 0) throw new Error('Amount must be defined and positive');
     const body = {
@@ -90,7 +90,7 @@ class BiwengerApi {
       price: amount,
       type: 'sell',
     };
-    return await axios.post(endpoints.apiV2Market, body, { headers: this.#headers });
+    return await axios.post(endpoints.apiV2Market, body, { headers: this.headers });
   }
 }
 

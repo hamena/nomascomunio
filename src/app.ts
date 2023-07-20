@@ -1,13 +1,18 @@
-import leagueModel from './model/league_model.js';
-import teamModel from './model/team_model.js';
-import marketModel from './model/market_model.js';
-import Analyst from './team/analyst.js';
-import Coach from './team/coach.js';
-import { playerPositions } from './api/basics_api.js';
+import Analyst from './team/analyst';
+import Coach from './team/coach';
+import { ILineUp, playerPositions } from './api/basics_api';
+import TeamModel from './model/team_model';
+import MarketModel from './model/market_model';
+import LeagueModel from './model/league_model';
+import IPlayer from './team/player';
 
 const app = async () => {
   try {
     console.info('jwt:', process.env.AUTH_TOKEN);
+
+    const teamModel = new TeamModel();
+    const marketModel = new MarketModel();
+    const leagueModel = new LeagueModel();
 
     await teamModel.fetch();
     // console.info('team players:', teamModel.getPlayers())
@@ -41,11 +46,11 @@ const app = async () => {
     const coach = new Coach(leagueModel, teamModel, analyst);
     const lineups = coach.bestLineups();
     const lineupsArray = Object.values(lineups);
-    lineupsArray.forEach((lineup) => printLineup(lineup));
+    lineupsArray.forEach((lineup) => printLineup(leagueModel, lineup));
     lineupsArray.sort((a, b) => b.perfEval - a.perfEval);
     const bestLineup = lineupsArray[0];
     console.info('Best lineup: ');
-    printLineup(bestLineup);
+    printLineup(leagueModel, bestLineup);
     // wbapi.putLineUp(bestLineup.type, bestLineup.lineup)
 
     // // TEST MANAGER
@@ -56,18 +61,19 @@ const app = async () => {
   }
 };
 
-function printLineup(lineup) {
+function printLineup(leagueModel: LeagueModel, lineup: ILineUp) {
   const players = lineup.lineup
-    .map((playerId) => leagueModel.getPlayer(playerId))
+    .filter((playerId) => playerId !== null)
+    .map((playerId) => leagueModel.getPlayer(playerId !== null ? playerId : -1))
     .filter((player) => player !== undefined);
   const keepers = players.filter((player) => player.position === playerPositions.keeper);
   const defenders = players.filter((player) => player.position === playerPositions.defender);
   const midfielders = players.filter((player) => player.position === playerPositions.midfielder);
   const forwards = players.filter((player) => player.position === playerPositions.forward);
-  var keepersStr = 'KP: ';
-  var defendersStr = 'DF: ';
-  var midfieldersStr = 'MF: ';
-  var forwardsStr = 'FW: ';
+  let keepersStr = 'KP: ';
+  let defendersStr = 'DF: ';
+  let midfieldersStr = 'MF: ';
+  let forwardsStr = 'FW: ';
   keepers.forEach((keeper) => (keepersStr += keeper.slug + ', '));
   defenders.forEach((defender) => (defendersStr += defender.slug + ', '));
   midfielders.forEach((midfielder) => (midfieldersStr += midfielder.slug + ', '));
@@ -79,7 +85,7 @@ function printLineup(lineup) {
   console.info(forwardsStr);
 }
 
-function printPlayer(player) {
+function printPlayer(player: IPlayer) {
   console.info('-------------------------------------------');
   console.info(positionName[player.position], '[' + player.id + ']', player.slug, 'PERF:', player.perfEval);
   console.info('Value:', player.price, player.priceIncrement);
@@ -103,13 +109,6 @@ function printPlayer(player) {
   console.info('Fitness score:', player.fitnessScore);
 }
 
-const positionName = {
-  0: 'none',
-  1: 'KP',
-  2: 'DF',
-  3: 'MF',
-  4: 'FW',
-  5: 'COACH',
-};
+const positionName = ['none', 'KP', 'DF', 'MF', 'FW', 'COACH'];
 
 app();

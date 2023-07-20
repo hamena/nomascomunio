@@ -1,24 +1,26 @@
-import regression from 'regression';
+import regression, { DataPoint } from 'regression';
 import {
   maxPlayerPointsInFitness,
   maxPlayerPointsInSeason,
   maxPlayerPointsPerMatch,
   nRoundsInSeason,
-} from './knowledge.js';
+} from './knowledge';
+import LeagueModel from '../model/league_model';
+import IPlayer from './player';
 
 class Analyst {
-  #leagueModel;
+  private leagueModel: LeagueModel;
 
-  #nextRound;
-  #nextRoundNumber;
+  private nextRound;
+  private nextRoundNumber: number;
 
-  constructor(leagueModel) {
-    this.#leagueModel = leagueModel;
-    this.#nextRound = this.#leagueModel.getNextRound();
-    this.#nextRoundNumber = this.#nextRound ? Number.parseInt(this.#nextRound.name.substring(6)) : -1;
+  constructor(leagueModel: LeagueModel) {
+    this.leagueModel = leagueModel;
+    this.nextRound = this.leagueModel.getNextRound();
+    this.nextRoundNumber = this.nextRound ? Number.parseInt(this.nextRound.name.substring(6)) : -1;
   }
 
-  evalPlayer(player) {
+  evalPlayer(player: IPlayer) {
     this.#fitnessRegression(player);
     this.#fitnessScore(player);
     this.#playedMatches(player);
@@ -29,11 +31,12 @@ class Analyst {
     this.#postEval(player);
   }
 
-  #fitnessRegression(player) {
+  #fitnessRegression(player: IPlayer) {
     const fitness = player.fitness.map((v) => (typeof v === 'number' ? v : 0));
     fitness.reverse();
-    var data = [];
-    var counter = 0;
+
+    const data: DataPoint[] = [];
+    let counter = 0;
     fitness.forEach((y) => {
       data.push([counter, y]);
       counter += 1;
@@ -43,17 +46,17 @@ class Analyst {
     player.fitnessPrediction = result.predict(counter)[1];
   }
 
-  #fitnessScore(player) {
+  #fitnessScore(player: IPlayer) {
     const fitness = player.fitness.map((v) => (typeof v === 'number' ? v : 0));
     player.fitnessScore = fitness.reduce((sum, v) => sum + v, 0) / maxPlayerPointsInFitness;
   }
 
-  #playedMatches(player) {
-    player.playedAvg = player.playedTotal / this.#nextRoundNumber - 1;
+  #playedMatches(player: IPlayer) {
+    player.playedAvg = player.playedTotal / this.nextRoundNumber - 1;
   }
 
-  #points(player) {
-    const nFinishedRounds = this.#nextRoundNumber - 1;
+  #points(player: IPlayer) {
+    const nFinishedRounds = this.nextRoundNumber - 1;
     const currentSeasonPointsScore =
       nFinishedRounds > 0 ? player.points / (maxPlayerPointsPerMatch * nFinishedRounds) : 0;
     const lastSeasonPointsScore = player.pointsLastSeason / maxPlayerPointsInSeason;
@@ -66,7 +69,7 @@ class Analyst {
     player.pointsAvg = player.points / player.playedTotal;
   }
 
-  #postEval(player) {
+  #postEval(player: IPlayer) {
     // Apply health status
     if (player.status === 'injured') {
       player.perfEval = 0;
