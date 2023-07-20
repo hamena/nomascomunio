@@ -2,10 +2,12 @@
   "name": "biwenger-comander",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "node app.js",
-    "test": "test"
+    "start": "ts-node ./src/index.ts",
+    "test": "test",
+    "lint": "eslint . --ext .ts --ext .js",
+    "prettier:format": "prettier --config .prettierrc 'src/**/*.ts' 'src/**/*.js' --write"
   },
   "repository": {
     "type": "git",
@@ -27,5 +29,17 @@
     "dotenv": "^16.0.0",
     "regression": "^2.0.1"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "@types/regression": "^2.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
+  }
 }
