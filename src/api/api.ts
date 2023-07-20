@@ -6,38 +6,61 @@ import { scoreIds } from './basics_api.js';
 
 const baseUrl = 'https://biwenger.as.com';
 const endpoints = {
+  apiV2AuthLogin: baseUrl + '/api/v2/auth/login',
   apiV2User: baseUrl + '/api/v2/user',
   apiV2CompetitionsLaLigaData: baseUrl + '/api/v2/competitions/la-liga/data',
   apiV2Market: baseUrl + '/api/v2/market',
   apiV2Offers: baseUrl + '/api/v2/offers',
 };
 
-class BiwengerApi {
-  private headers;
+export interface IApiUser {
+  email: string;
+  password: string;
+  jwt: string;
+  id: number;
+  leagueId: number;
+}
 
-  constructor(jwt?: string, userid?: string, leagueid?: string) {
-    if (!jwt) throw new Error('JWT cannot be undefined');
-    if (!userid) throw new Error('User ID cannot be undefined');
-    if (!leagueid) throw new Error('League ID cannot be undefined');
-    this.headers = {
-      Authorization: 'Bearer ' + jwt,
-      'X-User': userid,
-      'X-League': leagueid,
+export default class BiwengerApi {
+  private readonly user: IApiUser;
+
+  constructor(apiUser: IApiUser) {
+    this.user = apiUser;
+  }
+
+  private headers() {
+    return {
+      Authorization: 'Bearer ' + this.user.jwt,
+      'X-User': this.user.id,
+      'X-League': this.user.leagueId,
+      'X-Lang': 'es',
+      'X-Version': 624,
     };
+  }
+
+  async auth() {
+    const body = { email: this.user.email, password: this.user.password };
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+      'X-Lang': 'es',
+      'X-Version': 624,
+    };
+    const response = await axios.post(endpoints.apiV2AuthLogin, body, { headers: headers });
+    this.user.jwt = response.data.token;
   }
 
   async getLaLigaInfo() {
     const params = {
       score: scoreIds.averageAsSofascore,
     };
-    return await axios.get(endpoints.apiV2CompetitionsLaLigaData, { headers: this.headers, params: params });
+    return await axios.get(endpoints.apiV2CompetitionsLaLigaData, { headers: this.headers(), params: params });
   }
 
   async getTeamInfo(fields: string = '*,lineup(type,playersID,reservesID,coach,date),players(id)') {
     const params = {
       fields: fields,
     };
-    return await axios.get(endpoints.apiV2User, { headers: this.headers, params: params });
+    return await axios.get(endpoints.apiV2User, { headers: this.headers(), params: params });
   }
 
   async putLineUp(type: string = '', lineup: number[] = []) {
@@ -50,11 +73,11 @@ class BiwengerApi {
         reservesID: [],
       },
     };
-    return await axios.put(endpoints.apiV2User, body, { headers: this.headers });
+    return await axios.put(endpoints.apiV2User, body, { headers: this.headers() });
   }
 
   async getMarketInfo() {
-    return await axios.get(endpoints.apiV2Market, { headers: this.headers });
+    return await axios.get(endpoints.apiV2Market, { headers: this.headers() });
   }
 
   async postOffer(playerid: number, amount: number, to = null) {
@@ -66,7 +89,7 @@ class BiwengerApi {
       to: to,
       type: 'purchase',
     };
-    return await axios.post(endpoints.apiV2Offers, body, { headers: this.headers });
+    return await axios.post(endpoints.apiV2Offers, body, { headers: this.headers() });
   }
 
   async putOffer(offerid: number, status: string) {
@@ -79,7 +102,7 @@ class BiwengerApi {
     const body = {
       status: status,
     };
-    return await axios.put(endpoints.apiV2Offers, body, { headers: this.headers });
+    return await axios.put(endpoints.apiV2Offers, body, { headers: this.headers() });
   }
 
   async postSale(playerid: number, amount: number) {
@@ -90,17 +113,6 @@ class BiwengerApi {
       price: amount,
       type: 'sell',
     };
-    return await axios.post(endpoints.apiV2Market, body, { headers: this.headers });
+    return await axios.post(endpoints.apiV2Market, body, { headers: this.headers() });
   }
 }
-
-const authToken = process.env.AUTH_TOKEN;
-const userId = process.env.USER_ID;
-const leagueId = process.env.LEAGUE_ID;
-
-console.info('jwt:', authToken);
-console.info('userId:', userId);
-console.info('leagueId:', leagueId);
-
-const bwapi = new BiwengerApi(authToken, userId, leagueId);
-export default bwapi;

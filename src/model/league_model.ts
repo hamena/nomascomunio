@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bwapi from '../api/api.js';
+import BiwengerApi from '../api/api.js';
 import IPlayer from '../team/player.js';
 
 export default class LeagueModel {
+  private readonly bwapi: BiwengerApi;
+
   private players: IPlayer[] = [];
   private rounds: any;
 
-  constructor() {}
+  constructor(bwapi: BiwengerApi) {
+    this.bwapi = bwapi;
+  }
 
   async fetch() {
     console.info('Fetching La Liga info...');
-    const response = await bwapi.getLaLigaInfo();
+    const response = await this.bwapi.getLaLigaInfo();
     this.players = response.data.data.players;
     this.rounds = response.data.data.season.rounds;
   }
