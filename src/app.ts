@@ -1,10 +1,10 @@
-import Analyst from './team/analyst';
-import Coach from './team/coach';
-import { ILineUp, playerPositions } from './api/basics_api';
-import TeamModel from './model/team_model';
-import MarketModel from './model/market_model';
-import LeagueModel from './model/league_model';
-import IPlayer from './team/player';
+import Analyst from './team/analyst.js';
+import Coach from './team/coach.js';
+import { ILineUp, playerPositions } from './api/basics_api.js';
+import TeamModel from './model/team_model.js';
+import MarketModel from './model/market_model.js';
+import LeagueModel from './model/league_model.js';
+import IPlayer from './team/player.js';
 
 const app = async () => {
   try {

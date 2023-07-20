@@ -1,7 +1,7 @@
-import { ILineUp } from '../api/basics_api';
-import LeagueModel from '../model/league_model';
-import MarketModel, { IOffer, ISale } from '../model/market_model';
-import session from '../api/session';
+import { ILineUp } from '../api/basics_api.js';
+import LeagueModel from '../model/league_model.js';
+import MarketModel, { IOffer, ISale } from '../model/market_model.js';
+import session from '../api/session.js';
 
 class Manager {
   private leagueModel: LeagueModel;

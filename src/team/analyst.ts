@@ -4,9 +4,9 @@ import {
   maxPlayerPointsInSeason,
   maxPlayerPointsPerMatch,
   nRoundsInSeason,
-} from './knowledge';
-import LeagueModel from '../model/league_model';
-import IPlayer from './player';
+} from './knowledge.js';
+import LeagueModel from '../model/league_model.js';
+import IPlayer from './player.js';
 
 class Analyst {
   private leagueModel: LeagueModel;

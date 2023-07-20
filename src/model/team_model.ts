@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bwapi from '../api/api';
+import bwapi from '../api/api.js';
 
 export default class TeamModel {
   private players = [];

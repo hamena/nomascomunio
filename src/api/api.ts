@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import axios from 'axios';
-import { scoreIds } from './basics_api';
+import { scoreIds } from './basics_api.js';
 
 const baseUrl = 'https://biwenger.as.com';
 const endpoints = {

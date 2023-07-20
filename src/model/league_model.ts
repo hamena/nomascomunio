@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import bwapi from '../api/api';
-import IPlayer from '../team/player';
+import bwapi from '../api/api.js';
+import IPlayer from '../team/player.js';
 
 export default class LeagueModel {
   private players: IPlayer[] = [];
