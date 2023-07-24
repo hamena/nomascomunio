@@ -16,7 +16,8 @@ export interface IApiLeague {
 
 export default {
   nomascomunio: {
-    leagueId: 0,
+    leagueId: 1644701,
+    // leagueId: 123,
     users: [
       { email: 'nomascomunio.dev.0@proton.me', password: nomascomunioPassword },
       { email: 'nomascomunio.dev.1@proton.me', password: nomascomunioPassword },
@@ -24,13 +25,13 @@ export default {
       { email: 'nomascomunio.dev.3@proton.me', password: nomascomunioPassword },
       { email: 'nomascomunio.dev.4@proton.me', password: nomascomunioPassword },
     ],
-  } as IApiLeague,
+  },
   greenGuys: {
-    leagueId: 0,
+    leagueId: 849511,
     users: [{ email: greenGuysEmail, password: greenGuysPassword }],
-  } as IApiLeague,
+  },
   ligaNuto: {
-    leagueId: 0,
+    leagueId: 873000,
     users: [{ email: ligaNutoEmail, password: ligaNutoPassword }],
-  } as IApiLeague,
-};
+  },
+} as { [key: string]: IApiLeague };

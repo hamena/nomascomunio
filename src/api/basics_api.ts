@@ -1,12 +1,3 @@
-export const scoreIds = {
-  sofascore: 1,
-  as: 2,
-  statistics: 3,
-  jornadaPerfecta: 4,
-  averageAsSofascore: 5,
-  biwengerSocial: 6,
-};
-
 export const playerPositions = {
   keeper: 1,
   defender: 2,
