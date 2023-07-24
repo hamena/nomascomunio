@@ -9,11 +9,6 @@ const greenGuysPassword = process.env.GREENGUYS_PASSWORD;
 const ligaNutoEmail = process.env.LIGANUTO_EMAIL;
 const ligaNutoPassword = process.env.LIGANUTO_PASSWORD;
 
-export interface IApiLeague {
-  leagueId: number;
-  users: Array<{ email: string; password: string }>;
-}
-
 export default {
   nomascomunio: {
     leagueId: 1644701,
@@ -34,4 +29,4 @@ export default {
     leagueId: 873000,
     users: [{ email: ligaNutoEmail, password: ligaNutoPassword }],
   },
-} as { [key: string]: IApiLeague };
+} as { [key: string]: { leagueId: number; users: { email: string; password: string }[] } };

@@ -1,6 +1,6 @@
 import { ILineUp, playerPositions } from './api/basics_api.js';
 import BiwengerApi from './api/biwengerapi.js';
-import league from './api/league.js';
+import league from './api/startup.api.data.js';
 import LeagueModel from './model/league_model.js';
 import MarketModel from './model/market_model.js';
 import TeamModel from './model/team_model.js';

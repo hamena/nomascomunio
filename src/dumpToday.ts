@@ -1,13 +1,13 @@
 import BiwengerApiDumper from './api/biwengerapidumper.js';
-import league from './api/league.js';
+import startupApiData from './api/startup.api.data.js';
 
 console.log("Hey there! I'm typescript!");
 
 const dumpApi = async () => {
   const bwapi = new BiwengerApiDumper(
-    league.nomascomunio.leagueId,
-    league.nomascomunio.users[0].email,
-    league.nomascomunio.users[0].password,
+    startupApiData.nomascomunio.leagueId,
+    startupApiData.nomascomunio.users[0].email,
+    startupApiData.nomascomunio.users[0].password,
   );
   await bwapi.fetchAuth();
   await bwapi.fetchBasicInfo();
@@ -22,9 +22,9 @@ const dumpApi = async () => {
 
   bwapi.dumpAuthData(authResponse.data);
   bwapi.dumpAccountData(accountResponse.data);
-  bwapi.dumpCompetitionData(laLigaResponse);
-  bwapi.dumpUserData(teamResponse);
-  bwapi.dumpMarketData(marketResponse);
+  bwapi.dumpCompetitionData({ status: 200, data: laLigaResponse });
+  bwapi.dumpUserData({ status: 200, data: teamResponse });
+  bwapi.dumpMarketData({ status: 200, data: marketResponse });
 };
 
 dumpApi();
