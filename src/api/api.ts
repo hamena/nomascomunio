@@ -7,7 +7,6 @@ const baseUrl = 'https://biwenger.as.com';
 const endpoints = {
   apiV2AuthLogin: baseUrl + '/api/v2/auth/login',
   apiV2Account: baseUrl + '/api/v2/account',
-  apiV2Home: baseUrl + '/api/v2/home',
   apiV2User: baseUrl + '/api/v2/user',
   apiV2CompetitionsLaLigaData: baseUrl + '/api/v2/competitions/la-liga/data',
   apiV2Market: baseUrl + '/api/v2/market',
@@ -70,6 +69,7 @@ export default class BiwengerApi {
     );
   }
 
+  // ---- COMMON HEADERS ----
   private headers() {
     if (!this.session.user.jwt) {
       throw new Error('User jwt is undefined. Must auth user first');
@@ -87,29 +87,14 @@ export default class BiwengerApi {
     };
   }
 
-  async auth() {
-    const body = { email: this.session.user.email, password: this.session.user.password };
-    const headers = {
-      'User-Agent': this.session.userAgent,
-      'X-Lang': this.session.lang,
-      'X-Version': this.session.version,
-    };
-    const response = await axios.post(endpoints.apiV2AuthLogin, body, { headers: headers });
+  // ---- FETCHERS ----
+  async fetchAuth() {
+    const response = await this.postAuth();
     this.session.user.jwt = response.data.token;
   }
 
   async fetchBasicInfo() {
-    if (!this.session.user.jwt) {
-      throw new Error('User jwt is undefined. Must auth user first');
-    }
-
-    const headers = {
-      Authorization: 'Bearer ' + this.session.user.jwt,
-      'User-Agent': this.session.userAgent,
-      'X-Lang': this.session.lang,
-      'X-Version': this.session.version,
-    };
-    const response = await axios.get(endpoints.apiV2Account, { headers: headers });
+    const response = await this.getAccount();
     const userLeagues = response.data.data.leagues;
     if (userLeagues.length < 1) {
       throw new Error('User doesnt belong to any league');
@@ -131,6 +116,30 @@ export default class BiwengerApi {
     this.session.user.points = league[0].user.points;
     this.session.user.position = league[0].user.position;
     this.session.user.balance = league[0].user.balance;
+  }
+
+  // ---- API METHODS ----
+  async postAuth() {
+    const body = { email: this.session.user.email, password: this.session.user.password };
+    const headers = {
+      'User-Agent': this.session.userAgent,
+      'X-Lang': this.session.lang,
+      'X-Version': this.session.version,
+    };
+    return await axios.post(endpoints.apiV2AuthLogin, body, { headers: headers });
+  }
+
+  async getAccount() {
+    if (!this.session.user.jwt) {
+      throw new Error('User jwt is undefined. Must auth user first');
+    }
+    const headers = {
+      Authorization: 'Bearer ' + this.session.user.jwt,
+      'User-Agent': this.session.userAgent,
+      'X-Lang': this.session.lang,
+      'X-Version': this.session.version,
+    };
+    return await axios.get(endpoints.apiV2Account, { headers: headers });
   }
 
   async getLaLigaInfo() {
