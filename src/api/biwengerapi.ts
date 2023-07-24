@@ -3,6 +3,9 @@ dotenv.config();
 
 import axios from 'axios';
 import { ApiSession, IBiwengerApi } from './api.js';
+import IApiCompetition from './competition.api.interface.js';
+import IApiUser from './user.api.interface.js';
+import IApiMarket from './market.api.interface.js';
 
 const baseUrl = 'https://biwenger.as.com';
 const endpoints = {
@@ -108,15 +111,22 @@ export default class BiwengerApi implements IBiwengerApi {
     const params = {
       score: this.session.league.scoreId,
     };
-    return await axios.get(endpoints.apiV2CompetitionsLaLigaData, { headers: this.headers(), params: params });
+    const response = await axios.get(endpoints.apiV2CompetitionsLaLigaData, {
+      headers: this.headers(),
+      params: params,
+    });
+    return response.data.data as IApiCompetition;
   }
 
-  // *,lineup(type,playersID,reservesID,captain,striker,coach,date),players(id,owner),market,offers,-trophies
-  async getTeamInfo(fields: string = '*,lineup(type,playersID,reservesID,coach,date),players(id)') {
+  // Alternative: *,lineup(type,playersID,reservesID,coach,date),players(id)
+  async getTeamInfo(
+    fields: string = '*,lineup(type,playersID,reservesID,captain,striker,coach,date),players(id,owner),market,offers,-trophies',
+  ) {
     const params = {
       fields: fields,
     };
-    return await axios.get(endpoints.apiV2User, { headers: this.headers(), params: params });
+    const response = await axios.get(endpoints.apiV2User, { headers: this.headers(), params: params });
+    return response.data.data as IApiUser;
   }
 
   async putLineUp(type: string = '', lineup: number[] = []) {
@@ -133,7 +143,8 @@ export default class BiwengerApi implements IBiwengerApi {
   }
 
   async getMarketInfo() {
-    return await axios.get(endpoints.apiV2Market, { headers: this.headers() });
+    const response = await axios.get(endpoints.apiV2Market, { headers: this.headers() });
+    return response.data.data as IApiMarket;
   }
 
   async postOffer(playerid: number, amount: number, to = null) {

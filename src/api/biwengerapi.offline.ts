@@ -3,6 +3,9 @@ import * as dotenv from 'dotenv';
 import { ApiSession, IBiwengerApi } from './api.js';
 import { AxiosResponse } from 'axios';
 import { readFileSync, readdirSync } from 'fs';
+import IApiCompetition from './competition.api.interface.js';
+import IApiUser from './user.api.interface.js';
+import IApiMarket from './market.api.interface.js';
 dotenv.config();
 
 export default class BiwengerApiOffline implements IBiwengerApi {
@@ -76,12 +79,12 @@ export default class BiwengerApiOffline implements IBiwengerApi {
   }
 
   async getLaLigaInfo() {
-    return this.competitionJson;
+    return this.competitionJson.data as IApiCompetition;
   }
 
   // *,lineup(type,playersID,reservesID,captain,striker,coach,date),players(id,owner),market,offers,-trophies
   async getTeamInfo(fields: string = '*,lineup(type,playersID,reservesID,coach,date),players(id)') {
-    return this.userJson;
+    return this.userJson.data as IApiUser;
   }
 
   async putLineUp(type: string = '', lineup: number[] = []) {
@@ -89,7 +92,7 @@ export default class BiwengerApiOffline implements IBiwengerApi {
   }
 
   async getMarketInfo() {
-    return this.marketJson;
+    return this.marketJson.data as IApiMarket;
   }
 
   async postOffer(playerid: number, amount: number, to = null) {

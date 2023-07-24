@@ -3,7 +3,7 @@ import LeagueModel from '../model/league_model.js';
 import TeamModel from '../model/team_model.js';
 import Analyst from './analyst.js';
 import { lineupsInfo } from './knowledge.js';
-import IPlayer from './player.js';
+import IPlayerExtended from './player.js';
 
 class Coach {
   private leagueModel: LeagueModel;
@@ -40,7 +40,7 @@ class Coach {
     teamForwards.sort((player1, player2) => player2.perfEval - player1.perfEval);
     const keyTyped = lineupType as keyof typeof lineupsInfo;
     const lineupInfo = lineupsInfo[keyTyped];
-    const lineup: IPlayer[] = [];
+    const lineup: IPlayerExtended[] = [];
     push(lineup, lineupInfo.nKeepers, teamKeepers);
     push(lineup, lineupInfo.nDefenders, teamDefenders);
     push(lineup, lineupInfo.nMidFielders, teamMidfielders);
@@ -54,7 +54,7 @@ class Coach {
   }
 }
 
-function push(lineup: (IPlayer | null)[], max: number, players: IPlayer[]) {
+function push(lineup: (IPlayerExtended | null)[], max: number, players: IPlayerExtended[]) {
   for (let i = 0; i < max; i++) {
     const player = players[i];
     if (player) {

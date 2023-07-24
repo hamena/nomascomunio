@@ -1,27 +1,30 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { IBiwengerApi } from '../api/api.js';
 import { ILineUp } from '../api/basics_api.js';
 import LeagueModel from '../model/league_model.js';
-import MarketModel, { IOffer, ISale } from '../model/market_model.js';
-import session from '../api/session.js';
+import MarketModel from '../model/market_model.js';
 
 class Manager {
+  private bwapi: IBiwengerApi;
   private leagueModel: LeagueModel;
   private marketModel: MarketModel;
 
   private maxBid = 0;
   private currentBalance = 0;
-  private marketSales: ISale[] = [];
-  private marketOffers: IOffer[] = [];
+  private marketSales: any[] = [];
+  private marketOffers: any[] = [];
 
-  private mySales: ISale[] = [];
-  private myOffers: IOffer[] = [];
-  private myBids: IOffer[] = [];
+  private mySales: any[] = [];
+  private myOffers: any[] = [];
+  private myBids: any[] = [];
 
   private toSell = [];
   private toAccept = [];
   private toReject = [];
   private toBid = [];
 
-  constructor(leagueModel: LeagueModel, marketModel: MarketModel) {
+  constructor(bwapi: IBiwengerApi, leagueModel: LeagueModel, marketModel: MarketModel) {
+    this.bwapi = bwapi;
     this.leagueModel = leagueModel;
     this.marketModel = marketModel;
     this.refresh();
@@ -32,10 +35,10 @@ class Manager {
     this.maxBid = this.marketModel.getMaxBid();
     this.marketSales = [];
     this.mySales = [];
-    this.marketModel.getSales().forEach((sale) => {
+    this.marketModel.getSales().forEach((sale: any) => {
       console.info(sale);
       sale.player = this.leagueModel.getPlayer(sale.player.id);
-      if (sale.user?.id === session.myUserId) {
+      if (sale.user?.id === this.bwapi.session.user.id) {
         this.mySales.push(sale);
       } else {
         this.marketSales.push(sale);
@@ -44,11 +47,15 @@ class Manager {
     this.marketOffers = [];
     this.myOffers = [];
     this.myBids = [];
-    this.marketModel.getOffers().forEach((offer) => {
+    this.marketModel.getOffers().forEach((offer: any) => {
       offer.player = this.leagueModel.getPlayer(offer.requestedPlayers[0]);
-      if (offer.to?.id === session.myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
+      if (offer.to?.id === this.bwapi.session.user.id && offer.type === 'purchase' && offer.status === 'waiting') {
         this.myOffers.push(offer);
-      } else if (offer.from.id === session.myUserId && offer.type === 'purchase' && offer.status === 'waiting') {
+      } else if (
+        offer.from.id === this.bwapi.session.user.id &&
+        offer.type === 'purchase' &&
+        offer.status === 'waiting'
+      ) {
         this.myBids.push(offer);
       } else {
         this.marketOffers.push(offer);

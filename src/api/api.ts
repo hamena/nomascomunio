@@ -1,7 +1,10 @@
 import * as dotenv from 'dotenv';
+import IApiCompetition from './competition.api.interface.js';
+import IApiUser from './user.api.interface.js';
+import IApiMarket from './market.api.interface.js';
 dotenv.config();
 
-export interface IApiUser {
+export interface IApiSessionUser {
   email: string;
   password: string;
   jwt?: string;
@@ -14,7 +17,7 @@ export interface IApiUser {
   balance?: number;
 }
 
-export interface IApiLeague {
+export interface IApiSessionLeague {
   id: number;
   name?: string;
   competition?: string;
@@ -28,8 +31,8 @@ export class ApiSession {
   readonly userAgent: string;
   readonly version: number;
   readonly lang: string;
-  readonly user: IApiUser;
-  readonly league: IApiLeague;
+  readonly user: IApiSessionUser;
+  readonly league: IApiSessionLeague;
 
   constructor(userAgent: string, lang: string, version: number, email: string, password: string, leagueId: number) {
     this.userAgent = userAgent;
@@ -44,14 +47,16 @@ export class ApiSession {
 }
 
 export interface IBiwengerApi {
+  readonly session: ApiSession;
+
   fetchAuth(): void;
   fetchBasicInfo(): void;
   postAuth(): unknown;
   getAccount(): unknown;
-  getLaLigaInfo(): unknown;
-  getTeamInfo(): unknown;
+  getLaLigaInfo(): Promise<IApiCompetition>;
+  getTeamInfo(): Promise<IApiUser>;
   putLineUp(): unknown;
-  getMarketInfo(): unknown;
+  getMarketInfo(): Promise<IApiMarket>;
   postOffer(playerid: number, amount: number, to: null): unknown;
   putOffer(offerid: number, status: string): unknown;
   postSale(playerid: number, amount: number): unknown;

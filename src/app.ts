@@ -6,7 +6,7 @@ import MarketModel from './model/market_model.js';
 import TeamModel from './model/team_model.js';
 import Analyst from './team/analyst.js';
 import Coach from './team/coach.js';
-import IPlayer from './team/player.js';
+import IPlayerExtended from './team/player.js';
 
 const app = async () => {
   try {
@@ -61,7 +61,7 @@ const app = async () => {
     // wbapi.putLineUp(bestLineup.type, bestLineup.lineup)
 
     // // TEST MANAGER
-    // const manager = new Manager(leagueModel, marketModel)
+    // const manager = new Manager(bwapi, leagueModel, marketModel)
     // manager.critics(bestLineup)
   } catch (error) {
     console.error('Oopsss this error should not be here!', error);
@@ -92,7 +92,7 @@ function printLineup(leagueModel: LeagueModel, lineup: ILineUp) {
   console.info(forwardsStr);
 }
 
-function printPlayer(player: IPlayer) {
+function printPlayer(player: IPlayerExtended) {
   console.info('-------------------------------------------');
   console.info(positionName[player.position], '[' + player.id + ']', player.slug, 'PERF:', player.perfEval);
   console.info('Value:', player.price, player.priceIncrement);

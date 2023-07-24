@@ -10,6 +10,14 @@ const app = async () => {
   await offlineBwapi.fetchBasicInfo();
 
   console.log(offlineBwapi.session);
+
+  const competition = await offlineBwapi.getLaLigaInfo();
+  const user = await offlineBwapi.getTeamInfo();
+  const market = await offlineBwapi.getMarketInfo();
+
+  console.log(competition);
+  console.log(user);
+  console.log(market);
 };
 
 app();

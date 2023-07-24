@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import BiwengerApi from '../api/api.js';
+import BiwengerApi from '../api/biwengerapi.js';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default class TeamModel {
   private readonly bwapi: BiwengerApi;
 
-  private players = [];
-  private lineup = [];
+  private players: number[] = [];
+  private lineup: number[] = [];
 
   constructor(bwapi: BiwengerApi) {
     this.bwapi = bwapi;
@@ -14,8 +14,8 @@ export default class TeamModel {
   async fetch() {
     console.info('Fetching team info...');
     const teamInfoResp = await this.bwapi.getTeamInfo();
-    this.players = teamInfoResp.data.data.players.map((player: any) => player.id);
-    this.lineup = teamInfoResp.data.data.lineup.playersID;
+    this.players = teamInfoResp.players.map((player) => player.id);
+    this.lineup = teamInfoResp.lineup.playersID;
   }
 
   getPlayers() {

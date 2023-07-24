@@ -22,9 +22,9 @@ const dumpApi = async () => {
 
   bwapi.dumpAuthData(authResponse.data);
   bwapi.dumpAccountData(accountResponse.data);
-  bwapi.dumpCompetitionData(laLigaResponse.data);
-  bwapi.dumpUserData(teamResponse.data);
-  bwapi.dumpMarketData(marketResponse.data);
+  bwapi.dumpCompetitionData(laLigaResponse);
+  bwapi.dumpUserData(teamResponse);
+  bwapi.dumpMarketData(marketResponse);
 };
 
 dumpApi();
