@@ -6,22 +6,17 @@ import MarketModel from './model/market_model.js';
 import LeagueModel from './model/league_model.js';
 import IPlayer from './team/player.js';
 import BiwengerApi from './api/api.js';
-
-if (!process.env.BW_API_USERNAME) {
-  throw new Error('Must set BW_API_USERNAME environment variable');
-}
-if (!process.env.BW_API_PASSWORD) {
-  throw new Error('Must set BW_API_PASSWORD environment variable');
-}
-
-const bwApiUsername = process.env.BW_API_USERNAME;
-const bwApiPassword = process.env.BW_API_PASSWORD;
+import league from './api/league.js';
 
 const app = async () => {
   try {
     console.info('jwt:', process.env.AUTH_TOKEN);
 
-    const bwapi = new BiwengerApi({ email: bwApiUsername, password: bwApiPassword, jwt: '', id: -1, leagueId: -1 });
+    const bwapi = new BiwengerApi(
+      league.nomascomunio.leagueId,
+      league.nomascomunio.users[0].email,
+      league.nomascomunio.users[0].password,
+    );
     const teamModel = new TeamModel(bwapi);
     const marketModel = new MarketModel(bwapi);
     const leagueModel = new LeagueModel(bwapi);

@@ -18,35 +18,54 @@ export interface IApiUser {
   password: string;
   jwt: string;
   id: number;
+}
+
+export interface IApiSession {
+  user: IApiUser;
   leagueId: number;
 }
 
-export default class BiwengerApi {
-  private readonly user: IApiUser;
+export class ApiSession implements IApiSession {
+  readonly user: IApiUser;
+  readonly leagueId: number;
 
-  constructor(apiUser: IApiUser) {
-    this.user = apiUser;
+  constructor(leagueId: number, email: string, password: string) {
+    this.user = {
+      email: email,
+      password: password,
+      jwt: '',
+      id: -1,
+    };
+    this.leagueId = leagueId;
+  }
+}
+
+export default class BiwengerApi {
+  readonly session: ApiSession;
+
+  constructor(leagueId: number, email: string, password: string) {
+    this.session = new ApiSession(leagueId, email, password);
   }
 
   private headers() {
     return {
-      Authorization: 'Bearer ' + this.user.jwt,
-      'X-User': this.user.id,
-      'X-League': this.user.leagueId,
+      Authorization: 'Bearer ' + this.session.user.jwt,
+      'X-User': this.session.user.id,
+      'X-League': this.session.leagueId,
       'X-Lang': 'es',
       'X-Version': 624,
     };
   }
 
   async auth() {
-    const body = { email: this.user.email, password: this.user.password };
+    const body = { email: this.session.user.email, password: this.session.user.password };
     const headers = {
       'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
       'X-Lang': 'es',
       'X-Version': 624,
     };
     const response = await axios.post(endpoints.apiV2AuthLogin, body, { headers: headers });
-    this.user.jwt = response.data.token;
+    this.session.user.jwt = response.data.token;
   }
 
   async getLaLigaInfo() {
