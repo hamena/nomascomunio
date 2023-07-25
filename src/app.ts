@@ -6,7 +6,7 @@ import MarketModel from './model/market_model.js';
 import TeamModel from './model/team_model.js';
 import Analyst from './team/analyst.js';
 import Coach from './team/coach.js';
-import IPlayerExtended from './team/player.js';
+import IPlayer from './team/player.js';
 
 const app = async () => {
   try {
@@ -92,7 +92,7 @@ function printLineup(leagueModel: LeagueModel, lineup: ILineUp) {
   console.info(forwardsStr);
 }
 
-function printPlayer(player: IPlayerExtended) {
+function printPlayer(player: IPlayer) {
   console.info('-------------------------------------------');
   console.info(positionName[player.position], '[' + player.id + ']', player.slug, 'PERF:', player.perfEval);
   console.info('Value:', player.price, player.priceIncrement);

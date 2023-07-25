@@ -1,6 +1,6 @@
-import { IPlayer } from '../api/competition.api.interface.js';
+import { IApiPlayer } from '../api/competition.api.interface.js';
 
-export default interface IPlayerExtended extends IPlayer {
+export default interface IPlayer extends IApiPlayer {
   perfEval: number;
 
   fitnessGradient: number;

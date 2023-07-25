@@ -1,8 +1,6 @@
-import * as dotenv from 'dotenv';
 import IApiCompetition from './competition.api.interface.js';
-import IApiUser from './user.api.interface.js';
 import IApiMarket from './market.api.interface.js';
-dotenv.config();
+import IApiUser from './user.api.interface.js';
 
 export interface IApiSessionUser {
   email: string;

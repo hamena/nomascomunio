@@ -1,12 +1,14 @@
-import BiwengerApiOffline from './api/biwengerapi.offline.js';
+import BiwengerApi from './api/biwengerapi.js';
 import startupApiData from './api/startup.api.data.js';
+import BiwengerReadonlyData from './model/biwenger.readonly.data.js';
 
 console.log("Hey there! I'm typescript!");
 
 const app = async () => {
-  const offlineBwapi = new BiwengerApiOffline(
+  const offlineBwapi = new BiwengerApi(
     startupApiData.nomascomunio.leagueId,
     startupApiData.nomascomunio.users[0].email,
+    startupApiData.nomascomunio.users[0].password,
   );
 
   await offlineBwapi.fetchAuth();
@@ -14,13 +16,7 @@ const app = async () => {
 
   console.log(offlineBwapi.session);
 
-  const competition = await offlineBwapi.getLaLigaInfo();
-  const user = await offlineBwapi.getTeamInfo();
-  const market = await offlineBwapi.getMarketInfo();
-
-  console.log(competition);
-  console.log(user);
-  console.log(market);
+  await BiwengerReadonlyData.fetch(offlineBwapi);
 };
 
 app();

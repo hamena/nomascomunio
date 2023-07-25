@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export interface IPlayer {
+export interface IApiPlayer {
   readonly id: number;
   readonly name: string;
   readonly slug: string;
@@ -48,6 +48,6 @@ export default interface IApiCompetition {
   readonly slug: string;
   readonly season: IApiSeason;
 
-  readonly teams: { [key: string]: IApiTeam };
-  readonly players: { [key: string]: IPlayer };
+  readonly teams: { readonly [key: string]: IApiTeam };
+  readonly players: { readonly [key: string]: IApiPlayer };
 }
