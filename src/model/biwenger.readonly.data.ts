@@ -1,5 +1,5 @@
 import { IBiwengerApi } from '../api/api.js';
-import IApiCompetition from '../api/competition.api.interface.js';
+import IApiCompetition, { IApiPlayer } from '../api/competition.api.interface.js';
 import IApiMarket from '../api/market.api.interface.js';
 import IApiUser from '../api/user.api.interface.js';
 
@@ -12,5 +12,9 @@ export default class BiwengerReadonlyData {
     this.competition = await bwapi.getLaLigaInfo();
     this.user = await bwapi.getTeamInfo();
     this.market = await bwapi.getMarketInfo();
+  }
+
+  static getPlayerInfo(id: number): IApiPlayer {
+    return this.competition.players[id];
   }
 }
